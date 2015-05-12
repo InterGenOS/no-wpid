@@ -1,0 +1,158 @@
+#!/bin/bash
+# wp - simple script to null/enable WordPress readme.html and license.txt files on a cPanel server
+# InterGen 5/12/15
+
+function SEPARATOR {
+tput setaf 3
+tput bold
+echo
+echo "----------------------------"
+echo
+}
+function BLOCK {
+    if [ -f /home/$USR/public_html/readme.html ]; then
+        tput bold
+        tput setaf 4
+        echo "Checking account $USR"
+        echo
+        tput bold
+        tput setaf 3
+        echo "Blocking 'readme.html' and 'license.txt' now..."
+        sleep 1
+        chown nobody:nobody /home/$USR/public_html/readme.html /home/$USR/public_html/license.txt
+        chmod 000 /home/$USR/public_html/readme.html /home/$USR/public_html/license.txt
+        echo
+        tput bold
+        tput setaf 2
+        echo "WordPress Indentifiers have been blocked for $USR."
+        SEPARATOR
+        tput sgr0
+    else
+        tput bold
+        tput setaf 4
+        echo "Checking account $USR"
+        echo
+        tput bold
+        tput setaf 1
+        echo "readme.html or license.txt not present, skipping $USR..."
+        SEPARATOR
+        tput sgr0
+    fi
+}
+function UNBLOCK {
+    if [ -f /home/$USR/public_html/readme.html ]; then
+        tput bold
+        tput setaf 4
+        echo "Checking account $USR"
+        echo
+        tput setaf 3
+        echo "Unblocking 'readme.html' and 'license.txt' now..."
+        sleep 1
+        chown $USR:$USR /home/$USR/public_html/readme.html /home/$USR/public_html/license.txt
+        chmod 644 /home/$USR/public_html/readme.html /home/$USR/public_html/license.txt
+        echo
+        tput bold
+        tput setaf 2
+        echo "WordPress Indentifiers have been unblocked for $USR."
+        SEPARATOR
+        tput sgr0
+    else
+        tput bold
+        tput setaf 4
+        echo "Checking account $USR"
+        echo
+        tput setaf 1
+        echo "readme.html or license.txt not present, skipping $USR..."
+        SEPARATOR
+        tput sgr0
+    fi
+}
+function ALL_USERS {
+echo
+echo
+tput bold
+tput setaf 2
+echo -n "Ok, are we -1)Blocking or -2)Unblocking WordPress Identifiers [1/2]? "
+read WHICH
+echo
+echo
+if [ $WHICH = 1 ]; then
+    echo
+    for USR in $(cat /etc/userdomains | awk '{print $2}' | grep -v nobody | uniq); do BLOCK; done
+    echo
+else
+    echo
+    for USR in $(cat /etc/userdomains | awk '{print $2}' | grep -v nobody | uniq); do UNBLOCK; done
+fi
+}
+function SINGLE_USER {
+clear
+echo 
+echo
+tput bold
+tput setaf 2
+echo
+echo "--------------------------------------------------------"
+echo
+echo "Which account are we adjusting WordPress Identifiers for? "
+SEPARATOR
+cat /etc/trueuserdomains | cut -d ' ' -f 2
+SEPARATOR
+tput sgr0
+echo -n "[enter account name]:"
+read USR
+if [ $USR != "$(cat /etc/passwd | grep $USR | cut -d ':' -f 1)" ]; then
+    echo
+    SEPARATOR
+    tput bold
+    tput setaf 1 
+    echo "That's not a valid user on this server Sparky, run it again..."
+    echo
+    tput bold
+    tput setaf 4
+    SEPARATOR
+    tput bold
+    tput setaf 3
+    exit 1
+else
+    SEPARATOR
+    tput bold
+    tput setaf 2
+    echo
+    echo -n "Ok, are we -1)Blocking or -2)Unblocking WordPress Identifiers [1/2]? "
+    read WHICH
+    echo
+    if [ $WHICH = 1 ]; then
+        SEPARATOR
+        echo
+        BLOCK $USR
+    else
+        UNBLOCK $USR
+    fi
+fi
+}
+
+clear
+echo
+echo
+tput bold
+tput setaf 2
+echo
+echo "------------------------------------------------------------------"
+echo
+echo -n "Are we adjusting WordPress Identifiers for the entire server [y/N]? "
+read SCOPE
+if [ -z "$SCOPE" ]; then
+    SINGLE_USER
+else
+    if [ "$SCOPE" = N ]; then
+        SINGLE_USER
+    else
+        if [ "$SCOPE" = n ]; then
+            SINGLE_USER
+        else
+            ALL_USERS
+        fi
+    fi
+fi
+exit 0
