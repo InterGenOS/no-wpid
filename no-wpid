@@ -77,6 +77,7 @@ do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
     fi
 }
 function ALL_USERS {
+clear
 printf "\n\n"
 GREEN
 echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
@@ -115,6 +116,7 @@ if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
     SEPARATOR
     exit 1
 else
+    clear
     SEPARATOR
     GREEN
     echo
