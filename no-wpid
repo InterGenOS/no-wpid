@@ -27,25 +27,49 @@ echo
 function BLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         SEPARATOR
-	BLUE
-        echo "Checking for WordPress Identifiers in account $USR"
+        BLUE
+        printf "Checking for WordPress Identifiers in account "
+        tput sgr0
+        printf "\"$USR\"\n"
         echo
         YELLOW
-	echo "Blocking all 'readme.*' and 'license.*' files now..."
+        printf "Blocking all "
+        tput sgr0
+        printf "'readme.*'"
+        YELLOW
+        printf " and "
+        tput sgr0
+        printf "'license.*'"
+        YELLOW
+        printf " files now...\n"
         sleep 1
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
+do chown nobody:nobody "$identifier" && chmod 000 "$identifier" && sleep 1; done
         echo
-	GREEN
-        echo "WordPress Indentifiers have been blocked for $USR."
+        GREEN
+        printf "WordPress Indentifiers have been blocked for account "
+        tput sgr0
+        printf "\"$USR\"\n"
         SEPARATOR
         tput sgr0
     else
-	BLUE
-        echo "Checking for WordPress Identifiers in account $USR"
+        BLUE
+        printf "Checking for WordPress Identifiers in account "
+        tput sgr0
+        printf "\"$USR\"\n"
         echo
-	RED
-        echo "No readme.* or license.* files found, skipping $USR..."
+        RED
+        printf "No "
+        tput sgr0
+        printf "readme.*"
+        RED
+        printf " or "
+        tput sgr0
+        printf "license.*"
+        RED
+        printf " files found, skipping account "
+        tput sgr0
+        printf "\"$USR\"...\n"
         SEPARATOR
         tput sgr0
     fi
@@ -53,25 +77,49 @@ do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
 function UNBLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         SEPARATOR
-	BLUE
-        echo "Checking for WordPress Identifiers in account $USR"
+        BLUE
+        printf "Checking for WordPress Identifiers in account "
+        tput sgr0
+        printf "\"$USR\"\n"
         echo
-	YELLOW
-        echo "Unblocking 'readme.*' and 'license.*' files now..."
+        YELLOW
+        printf "Unblocking "
+        tput sgr0
+        printf "'readme.*'"
+        YELLOW
+        printf " and "
+        tput sgr0
+        printf "'license.*'"
+        YELLOW
+        printf " files now...\n"
         sleep 1
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
+do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier" && sleep 1; done
         echo
-	GREEN
-        echo "WordPress Indentifiers have been unblocked for $USR."
+        GREEN
+        printf "WordPress Indentifiers have been unblocked for account "
+        tput sgr0
+        printf "\"$USR\"\n"
         SEPARATOR
         tput sgr0
     else
-	BLUE
-        echo "Checking for WordPress Identifiers in account $USR"
+        BLUE
+        printf "Checking for WordPress Identifiers in account "
+        tput sgr0
+        printf "\"$USR\"\n"
         echo
-	RED
-        echo "No readme.* or license.* files found, skipping $USR..."
+        RED
+        printf "No "
+        tput sgr0
+        printf "readme.*"
+        RED
+        printf " or "
+        tput sgr0
+        printf "license.*"
+        RED
+        printf " files found, skipping account "
+        tput sgr0
+        printf "\"$USR\"...\n"
         SEPARATOR
         tput sgr0
     fi
@@ -79,8 +127,22 @@ do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
 function ALL_USERS {
 clear
 printf "\n\n"
+tput sgr0
+echo
+echo "------------------------------------------------------------------"
+echo
 GREEN
-echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
+printf "Ok, are we "
+tput sgr0
+printf "1)'Blocking'"
+GREEN
+printf " or "
+tput sgr0
+printf "2)'Unblocking'"
+GREEN
+printf " WordPress Identifiers "
+tput sgr0
+echo -n "[1/2]? "
 old_stty_cfg=$(stty -g)
 stty raw -echo
 CHOICE=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
@@ -96,31 +158,51 @@ fi
 function SINGLE_USER {
 clear
 printf "\n\n"
-GREEN
+tput sgr0
 echo
 echo "--------------------------------------------------------"
 echo
+GREEN
 echo "Which account are we adjusting WordPress Identifiers for? "
 SEPARATOR
+tput sgr0
 grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq
 SEPARATOR
 tput sgr0
-echo -n "[enter account name]:"
+printf "["
+GREEN
+printf "enter account name"
+tput sgr0
+printf "]"
+echo -n ":"
 read USR
 if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
     echo
     SEPARATOR
+    tput sgr0
+    printf "\"$USR\""
     RED
-    echo "That's not a valid user on this server Sparky, run it again..."
+    printf " isn't a valid user on this server, Sparky... run it again...\n"
     echo
     SEPARATOR
-    exit 1
+    exit 0
 else
     clear
-    SEPARATOR
+    tput sgr0
+    echo "------------------------------------------------------------------"
     GREEN
     echo
-    echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
+    printf "Ok, are we "
+    tput sgr0
+    printf "1)'Blocking'"
+    GREEN
+    printf " or "
+    tput sgr0
+    printf "2)'Unblocking'"
+    GREEN
+    printf " WordPress Identifiers "
+    tput sgr0
+    echo -n "[1/2]? "
     old_stty_cfg=$(stty -g)
     stty raw -echo
     WHICH=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
@@ -136,11 +218,14 @@ fi
 }
 clear
 printf "\n\n"
-GREEN
+tput sgr0
 echo
 echo "------------------------------------------------------------------"
+GREEN
 echo
-echo -n "Are we adjusting WordPress Identifiers for the entire server [y/n]? "
+printf "Are we adjusting WordPress Identifiers for the entire server "
+tput sgr0
+echo -n "[y/n]? "
 old_stty_cfg=$(stty -g)
 stty raw -echo
 answer="$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )"
