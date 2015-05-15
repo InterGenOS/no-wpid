@@ -11,6 +11,7 @@ echo
 }
 function BLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
+        SEPARATOR
         tput bold
         tput setaf 4
         echo "Checking account $USR"
@@ -41,6 +42,7 @@ do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
 }
 function UNBLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
+        SEPARATOR
         tput bold
         tput setaf 4
         echo "Checking account $USR"
@@ -73,15 +75,15 @@ echo
 tput bold
 tput setaf 2
 echo -n "Ok, are we -1)Blocking or -2)Unblocking WordPress Identifiers [1/2]? "
-read WHICH
-echo
-echo
-if [ "$WHICH" = 1 ]; then
-    echo
+old_stty_cfg=$(stty -g)
+stty raw -echo
+CHOICE=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
+stty $old_stty_cfg
+if echo "$CHOICE" | grep -iq "1" ;then
+    printf "\n\n"
     for USR in $(grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq); do BLOCK; done
-    echo
 else
-    echo
+    printf "\n\n"
     for USR in $(grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq); do UNBLOCK; done
 fi
 }
@@ -119,19 +121,20 @@ else
     tput bold
     tput setaf 2
     echo
-    echo -n "Ok, are we -1)Blocking or -2)Unblocking WordPress Identifiers [1/2]? "
-    read WHICH
-    echo
-    if [ "$WHICH" = 1 ]; then
-        SEPARATOR
-        echo
+    echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
+    old_stty_cfg=$(stty -g)
+    stty raw -echo
+    WHICH=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
+    stty $old_stty_cfg
+    if echo "$WHICH" | grep -iq "1" ;then
+        printf "\n\n"
         BLOCK "$USR"
     else
+        printf "\n\n"
         UNBLOCK "$USR"
     fi
 fi
 }
-
 clear
 echo
 echo
@@ -140,33 +143,16 @@ tput setaf 2
 echo
 echo "------------------------------------------------------------------"
 echo
-echo -n "Are we adjusting WordPress Identifiers for the entire server [y/N]? "
-read SCOPE
-if [ -z "$SCOPE" ]; then
-    SINGLE_USER
+echo -n "Are we adjusting WordPress Identifiers for the entire server [y/n]? "
+old_stty_cfg=$(stty -g)
+stty raw -echo
+answer="$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )"
+stty $old_stty_cfg
+if echo "$answer" | grep -iq "^y" ;then
+    echo
+    ALL_USERS
 else
-    if [ "$SCOPE" = N ]; then
-        SINGLE_USER
-    else
-        if [ "$SCOPE" = n ]; then
-            SINGLE_USER
-        else
-            if [ "$SCOPE" = Y ]; then
-                ALL_USERS
-            else
-                if [ "$SCOPE" = y ]; then
-                    ALL_USERS
-                else
-                    SEPARATOR
-                    tput bold
-                    tput setaf 1
-                    echo "That was a 'yes or no' question Sparky... run it again"
-                    SEPARATOR
-                    printf "\n\n"
-                    exit 0
-                fi
-            fi
-        fi
-    fi
+    echo
+    SINGLE_USER
 fi
 exit 0
