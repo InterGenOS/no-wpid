@@ -2,9 +2,24 @@
 # wp - simple script to null/enable WordPress readme.html and license.txt files on a cPanel server
 # InterGen 5/12/15
 
-function SEPARATOR {
-tput setaf 3
+function RED {
 tput bold
+tput setaf 1
+}
+function GREEN {
+tput bold
+tput setaf 2
+}
+function Yellow {
+tput bold
+tput setaf 3
+}
+function BLUE {
+tput bold
+tput setaf 4
+}
+function SEPARATOR {
+YELLOW
 echo
 echo "----------------------------"
 echo
@@ -12,29 +27,24 @@ echo
 function BLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         SEPARATOR
-        tput bold
-        tput setaf 4
+	BLUE
         echo "Checking account $USR"
         echo
-        tput bold
-        tput setaf 3
-        echo "Blocking all 'readme.*' and 'license.*' files now..."
+        YELLOW
+	echo "Blocking all 'readme.*' and 'license.*' files now..."
         sleep 1
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
 do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
         echo
-        tput bold
-        tput setaf 2
+	GREEN
         echo "WordPress Indentifiers have been blocked for $USR."
         SEPARATOR
         tput sgr0
     else
-        tput bold
-        tput setaf 4
-        echo "Checking WordPress Identifiers in account $USR"
+	BLUE
+        echo "Checking for WordPress Identifiers in account $USR"
         echo
-        tput bold
-        tput setaf 1
+	RED
         echo "No readme.* or license.* files found, skipping $USR..."
         SEPARATOR
         tput sgr0
@@ -43,38 +53,33 @@ do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
 function UNBLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         SEPARATOR
-        tput bold
-        tput setaf 4
-        echo "Checking account $USR"
+	BLUE
+        echo "Checking for WordPress Identifiers in account $USR"
         echo
-        tput setaf 3
+	YELLOW
         echo "Unblocking 'readme.*' and 'license.*' files now..."
         sleep 1
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
 do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
         echo
-        tput bold
-        tput setaf 2
+	GREEN
         echo "WordPress Indentifiers have been unblocked for $USR."
         SEPARATOR
         tput sgr0
     else
-        tput bold
-        tput setaf 4
-        echo "Checking account $USR"
+	BLUE
+        echo "Checking for WordPress Identifiers in account $USR"
         echo
-        tput setaf 1
-        echo "readme.html or license.txt not present, skipping $USR..."
+	RED
+        echo "No readme.* or license.* files found, skipping $USR..."
         SEPARATOR
         tput sgr0
     fi
 }
 function ALL_USERS {
-echo
-echo
-tput bold
-tput setaf 2
-echo -n "Ok, are we -1)Blocking or -2)Unblocking WordPress Identifiers [1/2]? "
+printf "\n\n"
+GREEN
+echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
 old_stty_cfg=$(stty -g)
 stty raw -echo
 CHOICE=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
@@ -89,10 +94,8 @@ fi
 }
 function SINGLE_USER {
 clear
-echo 
-echo
-tput bold
-tput setaf 2
+printf "\n\n"
+GREEN
 echo
 echo "--------------------------------------------------------"
 echo
@@ -106,20 +109,14 @@ read USR
 if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
     echo
     SEPARATOR
-    tput bold
-    tput setaf 1 
+    RED
     echo "That's not a valid user on this server Sparky, run it again..."
     echo
-    tput bold
-    tput setaf 4
     SEPARATOR
-    tput bold
-    tput setaf 3
     exit 1
 else
     SEPARATOR
-    tput bold
-    tput setaf 2
+    GREEN
     echo
     echo -n "Ok, are we 1)'Blocking' or 2)'Unblocking' WordPress Identifiers [1/2]? "
     old_stty_cfg=$(stty -g)
@@ -136,10 +133,8 @@ else
 fi
 }
 clear
-echo
-echo
-tput bold
-tput setaf 2
+printf "\n\n"
+GREEN
 echo
 echo "------------------------------------------------------------------"
 echo
