@@ -28,7 +28,7 @@ function BLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         SEPARATOR
 	BLUE
-        echo "Checking account $USR"
+        echo "Checking for WordPress Identifiers in account $USR"
         echo
         YELLOW
 	echo "Blocking all 'readme.*' and 'license.*' files now..."
