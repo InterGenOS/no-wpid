@@ -46,9 +46,9 @@ function BLOCK {
         printf "'license.*'"
         YELLOW
         printf " files now...\n"
-        sleep 1
+        sleep 2
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown nobody:nobody "$identifier" && chmod 000 "$identifier" && sleep 1; done
+do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
         echo
         GREEN
         printf "WordPress Indentifiers have been blocked for account "
@@ -96,9 +96,9 @@ function UNBLOCK {
         printf "'license.*'"
         YELLOW
         printf " files now...\n"
-        sleep 1
+        sleep 2
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier" && sleep 1; done
+do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
         echo
         GREEN
         printf "WordPress Indentifiers have been unblocked for account "
