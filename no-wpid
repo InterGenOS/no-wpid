@@ -10,7 +10,7 @@ function GREEN {
 tput bold
 tput setaf 2
 }
-function Yellow {
+function YELLOW {
 tput bold
 tput setaf 3
 }
