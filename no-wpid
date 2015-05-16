@@ -151,10 +151,10 @@ CHOICE=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
 stty $old_stty_cfg
 if echo "$CHOICE" | grep -iq "1" ;then
     printf "\n\n"
-    for USR in $(grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq); do BLOCK; done
+    for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do BLOCK; done
 else
     printf "\n\n"
-    for USR in $(grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq); do UNBLOCK; done
+    for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do UNBLOCK; done
 fi
 }
 function SINGLE_USER {
@@ -166,7 +166,7 @@ GREEN
 echo "Which account are we adjusting WordPress Identifiers for? "
 SEPARATOR
 tput sgr0
-grep \: /etc/userdomains | grep -v nobody | awk '{print $2}' | uniq
+grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq
 SEPARATOR
 tput sgr0
 printf "["
