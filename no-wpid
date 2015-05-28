@@ -1,149 +1,203 @@
 #!/bin/bash
-# wp - simple script to null/enable WordPress readme.html and license.txt files on a cPanel server
-# InterGen 5/12/15
+# ----------------------------------------------------------------------------------------------------
+# no-wpid: simple script to null/enable WordPress readme.html and license.txt files on a cPanel server
+# no-wpid Version: 1.0
+# Github: https://github.com/InterGenStudios/no-wpid
+# ---------------------------------------------------
+# InterGenStudios: 5-12-15
+# Copyright (c) 2015: Christopher 'InterGen' Cork  InterGenStudios
+# URL: https://intergenstudios.com
+# --------------------------------
+# License: GPL-2.0+
+# URL: http://opensource.org/licenses/gpl-license.php
+# ---------------------------------------------------
+# no-wpid is free software:
+# You may redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software
+# Foundation, either version 2 of the License, or (at your discretion)
+# any later version.
+# ------------------
 
-function RED {
-tput bold
-tput setaf 1
+#############################################
+##-----------------------------------------##
+## BEGIN - MAKE SURE WE'RE RUNNING AS ROOT ##
+##-----------------------------------------##
+#############################################
+
+if [ "$(id -u)" != "0" ]; then
+    tput bold
+    tput setaf 1
+    printf "\n\n"
+    echo "--------"
+    echo "WARNING!"
+    echo "--------"
+    echo
+    tput sgr0
+    echo "no-wpid must be run as root!"
+    echo "(Exiting now...)"
+    printf "\n\n"
+    exit 1
+fi
+
+###########################################
+##---------------------------------------##
+## END - MAKE SURE WE'RE RUNNING AS ROOT ##
+##---------------------------------------##
+###########################################
+
+#######################
+##-------------------##
+## BEGIN - FUNCTIONS ##
+##-------------------##
+#######################
+
+# Colors trailing text Red
+RED () {
+    tput bold
+    tput setaf 1
 }
-function GREEN {
-tput bold
-tput setaf 2
+
+# Colors trailing text Green
+GREEN () {
+    tput bold
+    tput setaf 2
 }
-function YELLOW {
-tput bold
-tput setaf 3
+
+# Colors trailing text Yellow
+YELLOW () {
+    tput bold
+    tput setaf 3
 }
-function BLUE {
-tput bold
-tput setaf 4
+
+# Colors trailing text Blue
+BLUE () {
+    tput bold
+    tput setaf 4
 }
-function SEPARATOR {
+
+# Clears any preceding text color declarations
+WHITE () {
+tput sgr0
+}
+
+# Simple divider
+SEPARATOR () {
 YELLOW
 echo
 echo "----------------------------"
 echo
 }
+
+# Simple divider
 function SEPARATOR_WHITE {
 tput sgr0
 echo "------------------------------------------------------------------"
 }
+
+# Creates uniform look during script execution when called after any clear command
+HEADER () {
+echo
+BLUE
+echo "============================================================================"
+WHITE
+echo "  no-wpid v1.0"
+BLUE
+echo "============================================================================"
+WHITE
+printf "\n\n"
+}
+
+# Blocks readme.html and license.txt files in WordPress installations
 function BLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
-        SEPARATOR
+        clear
+        HEADER
         BLUE
         printf "Checking for WordPress Identifiers in account "
-        tput sgr0
+        WHITE
         printf "\"$USR\"\n"
-        echo
-        YELLOW
-        printf "Blocking all "
-        tput sgr0
-        printf "'readme.*'"
-        YELLOW
-        printf " and "
-        tput sgr0
-        printf "'license.*'"
-        YELLOW
-        printf " files now...\n"
-        sleep 2
-        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown nobody:nobody "$identifier" && chmod 000 "$identifier"; done
-        echo
-        GREEN
-        printf "WordPress Indentifiers have been blocked for account "
-        tput sgr0
-        printf "\"$USR\"\n"
-        SEPARATOR
-        tput sgr0
+        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do 
+            chown nobody:nobody "$identifier" && chmod 000 "$identifier" && echo "$USR" >> userlist
+        done
     else
+        clear
+        HEADER
         BLUE
         printf "Checking for WordPress Identifiers in account "
-        tput sgr0
+        WHITE
         printf "\"$USR\"\n"
-        echo
-        RED
-        printf "No "
-        tput sgr0
-        printf "readme.*"
-        RED
-        printf " or "
-        tput sgr0
-        printf "license.*"
-        RED
-        printf " files found, skipping account "
-        tput sgr0
-        printf "\"$USR\"...\n"
-        SEPARATOR
-        tput sgr0
+        echo "$USR" >> noidfoundlist
     fi
+    clear
+    HEADER
+    BLUE
+    echo "Wordpress Identifiers blocked for account(s):"
+    echo
+    cat userlist
+    SEPERATOR
+    echo "No readme.* or license.* files found for account(s):
+    echo
+    cat noidfoundlist
+    rm -rf userlist noidfoundlist
+    printf "\n\n"
+    WHITE
+    exit 0
 }
+
+# Unblocks readme.html and license.txt files in WordPress installatins (to allow for upgrading)
 function UNBLOCK {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
-        SEPARATOR
+        clear
+        HEADER
         BLUE
         printf "Checking for WordPress Identifiers in account "
-        tput sgr0
+        WHITE
         printf "\"$USR\"\n"
         echo
-        YELLOW
-        printf "Unblocking "
-        tput sgr0
-        printf "'readme.*'"
-        YELLOW
-        printf " and "
-        tput sgr0
-        printf "'license.*'"
-        YELLOW
-        printf " files now...\n"
-        sleep 2
-        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); 
-do chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier"; done
-        echo
-        GREEN
-        printf "WordPress Indentifiers have been unblocked for account "
-        tput sgr0
-        printf "\"$USR\"\n"
-        SEPARATOR
-        tput sgr0
+        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
+            chown "$USR":"$USR" "$identifier" && chmod 644 && "$identifier" && echo "$USR" >> userlist
+        done
     else
+        clear
+        HEADER
         BLUE
         printf "Checking for WordPress Identifiers in account "
         tput sgr0
         printf "\"$USR\"\n"
-        echo
-        RED
-        printf "No "
-        tput sgr0
-        printf "readme.*"
-        RED
-        printf " or "
-        tput sgr0
-        printf "license.*"
-        RED
-        printf " files found, skipping account "
-        tput sgr0
-        printf "\"$USR\"...\n"
-        SEPARATOR
-        tput sgr0
+        echo "$USR" >> noidfoundlist
+    fi
+    clear
+    HEADER
+    BLUE
+    echo "Wordpress Identifiers unblocked for account(s):"
+    echo
+    cat userlist
+    SEPERATOR
+    echo "No readme.* or license.* files found for account(s):
+    echo
+    cat noidfoundlist
+    rm -rf userlist noidfoundlist
+    printf "\n\n"
+    WHITE
+    exit 0
     fi
 }
+
+# Routes for all users
 function ALL_USERS {
 clear
-printf "\n\n"
-SEPARATOR_WHITE
-echo
+HEADER
 GREEN
 printf "Ok, are we "
-tput sgr0
+WHITE
 printf "1)'Blocking'"
 GREEN
 printf " or "
-tput sgr0
+WHITE
 printf "2)'Unblocking'"
 GREEN
 printf " WordPress Identifiers "
-tput sgr0
+WHITE
 echo -n "[1/2]? "
 old_stty_cfg=$(stty -g)
 stty raw -echo
@@ -157,29 +211,29 @@ else
     for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do UNBLOCK; done
 fi
 }
+
+# Routes for single users
 function SINGLE_USER {
 clear
-printf "\n\n"
-SEPARATOR_WHITE
-echo
+HEADER
 GREEN
 echo "Which account are we adjusting WordPress Identifiers for? "
 SEPARATOR
-tput sgr0
+WHITE
 grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq
 SEPARATOR
-tput sgr0
+WHITE
 printf "["
 GREEN
 printf "enter account name"
-tput sgr0
+WHITE
 printf "]"
 echo -n ":"
 read USR
 if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
-    echo
-    SEPARATOR
-    tput sgr0
+    clear
+    HEADER
+    WHITE
     printf "\"$USR\""
     RED
     printf " isn't a valid user on this server, Sparky... run it again...\n"
@@ -188,19 +242,19 @@ if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
     exit 0
 else
     clear
-    SEPARATOR_WHITE
+    HEADER
     GREEN
     echo
     printf "Ok, are we "
-    tput sgr0
+    WHITE
     printf "1)'Blocking'"
     GREEN
     printf " or "
-    tput sgr0
+    WHITE
     printf "2)'Unblocking'"
     GREEN
     printf " WordPress Identifiers "
-    tput sgr0
+    WHITE
     echo -n "[1/2]? "
     old_stty_cfg=$(stty -g)
     stty raw -echo
@@ -215,13 +269,25 @@ else
     fi
 fi
 }
+
+#####################
+##-----------------##
+## END - FUNCTIONS ##
+##-----------------##
+#####################
+
+#########################
+##---------------------##
+## BEGIN - CORE SCRIPT ##
+##---------------------##
+#########################
+
 clear
-printf "\n\n"
-SEPARATOR_WHITE
+HEADER
 GREEN
 echo
 printf "Are we adjusting WordPress Identifiers for the entire server "
-tput sgr0
+WHITE
 echo -n "[y/n]? "
 old_stty_cfg=$(stty -g)
 stty raw -echo
@@ -235,3 +301,9 @@ else
     SINGLE_USER
 fi
 exit 0
+
+#######################
+##-------------------##
+## END - CORE SCRIPT ##
+##-------------------##
+#######################
