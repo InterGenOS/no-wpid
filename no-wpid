@@ -198,6 +198,7 @@ echo " 1) Blocking"
 echo
 echo " 2) Unblocking"
 echo
+WHITE
 echo -n "[enter selection]: "
 read CHOICE
     case $CHOICE in
@@ -231,6 +232,7 @@ read CHOICE
         cat userlist | uniq
         SEPARATOR
         if [ -e noidfoundlist ]; then
+            YELLOW
             echo "No readme.* or license.* files found for account(s):"
             echo
             WHITE
@@ -269,6 +271,7 @@ read CHOICE
         cat userlist | uniq
         SEPARATOR
         if [ -e noidfoundlist ]; then
+            YELLOW
             echo "No readme.* or license.* files found for account(s):"
             echo
             WHITE
@@ -340,6 +343,7 @@ else
             echo
             echo " 2) Unblocking"
             echo
+            WHITE
             echo -n "[enter selection]:"
             read CHOICE
                 case $CHOICE in
