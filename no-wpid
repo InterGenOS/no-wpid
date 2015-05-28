@@ -135,7 +135,7 @@ BLOCK () {
     echo
     cat userlist
     SEPERATOR
-    echo "No readme.* or license.* files found for account(s):
+    echo "No readme.* or license.* files found for account(s):"
     echo
     cat noidfoundlist
     rm -rf userlist noidfoundlist
@@ -173,7 +173,7 @@ UNBLOCK () {
     echo
     cat userlist
     SEPERATOR
-    echo "No readme.* or license.* files found for account(s):
+    echo "No readme.* or license.* files found for account(s):"
     echo
     cat noidfoundlist
     rm -rf userlist noidfoundlist
