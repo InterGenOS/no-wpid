@@ -136,7 +136,7 @@ BLOCK () {
     WHITE
     cat userlist | uniq
     SEPARATOR
-    if [ -n $(cat noidfoundlist) ]; then
+    if [ -f noidfoundlist ]; then
         echo "No readme.* or license.* files found for account(s):"
         echo
         WHITE
@@ -179,7 +179,7 @@ UNBLOCK () {
     WHITE
     cat userlist | uniq
     SEPARATOR
-    if [ -n $(cat noidfoundlist) ]; then
+    if [ -f noidfoundlist ]; then
         echo "No readme.* or license.* files found for account(s):"
         echo
         WHITE
