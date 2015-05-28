@@ -136,7 +136,7 @@ BLOCK () {
     WHITE
     cat userlist | uniq
     SEPARATOR
-    if [ -f noidfoundlist ]; then
+    if [ ! -f noidfoundlist ]; then
         echo "No readme.* or license.* files found for account(s):"
         echo
         WHITE
@@ -144,12 +144,11 @@ BLOCK () {
     fi
     printf "\n\n"
     WHITE
-    exit 0
 }
 
 # Unblocks readme.html and license.txt files in WordPress installatins (to allow for upgrading)
 UNBLOCK () {
-    if [ -f /home/"$USR"/public_html/readme.html ]; then
+    if [ ! -f /home/"$USR"/public_html/readme.html ]; then
         clear
         HEADER
         BLUE
@@ -185,7 +184,6 @@ UNBLOCK () {
     fi
     printf "\n\n"
     WHITE
-    exit 0
 }
 
 # Routes for all users
@@ -193,84 +191,88 @@ ALL_USERS () {
 clear
 HEADER
 GREEN
-printf "Ok, are we "
-WHITE
-printf "1)'Blocking'"
-GREEN
-printf " or "
-WHITE
-printf "2)'Unblocking'"
-GREEN
-printf " WordPress Identifiers "
-WHITE
-echo -n "[1/2]? "
-old_stty_cfg=$(stty -g)
-stty raw -echo
-CHOICE=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
-stty $old_stty_cfg
-if echo "$CHOICE" | grep -iq "1" ;then
-    printf "\n\n"
-    for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do BLOCK; done
-else
-    printf "\n\n"
-    for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do UNBLOCK; done
-fi
+echo "Which operation are we performing?"
+echo
+echo " 1) Blocking"
+echo
+echo " 2) Unblocking"
+read CHOICE
+    case $CHOICE in
+        1) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
+            BLOCK
+           done;;
+        2) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
+            UNBLOCK
+           done;;
+    esac
 }
 
 # Routes for single users
 SINGLE_USER () {
+NC='^[0-9]+$'
 clear
 HEADER
 GREEN
 echo "Which account are we adjusting WordPress Identifiers for? "
 SEPARATOR
 WHITE
-grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq
+grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq > accountlist
+sed = accountlist | sed 'N;s/\n/\t/' > accountchoices
+cat accountchoices
+echo
 SEPARATOR
 WHITE
-printf "["
-GREEN
-printf "enter account name"
-WHITE
-printf "]"
-echo -n ":"
-read USR
-if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
-    clear
-    HEADER
-    WHITE
-    printf "\"$USR\""
+echo -n "Select account [q for quit]? "
+read ACCOUNT_CHOICE
+if [ "$(echo "$ACCOUNT_CHOICE")" = "Q" ] || [ "$(echo "$ACCOUNT_CHOICE")" = "q" ]; then
+    printf "\n\n"
     RED
-    printf " isn't a valid user on this server, Sparky... run it again...\n"
-    echo
-    SEPARATOR
+    echo "Quiting..."
+    rm -rf accountlist accountchoices
+    WHITE
+    sleep 1
+    clear
     exit 0
 else
-    clear
-    HEADER
-    GREEN
-    echo
-    printf "Ok, are we "
-    WHITE
-    printf "1)'Blocking'"
-    GREEN
-    printf " or "
-    WHITE
-    printf "2)'Unblocking'"
-    GREEN
-    printf " WordPress Identifiers "
-    WHITE
-    echo -n "[1/2]? "
-    old_stty_cfg=$(stty -g)
-    stty raw -echo
-    WHICH=$( while ! head -c 1 | grep -i '[12]' ;do true ;done )
-    stty $old_stty_cfg
-    if echo "$WHICH" | grep -iq "1" ;then
-        printf "\n\n"
-        BLOCK "$USR"
+    # Loop the script if an invalid choice is given
+    if ! [[ $ACCOUNT_CHOICE =~ $NC ]]; then
+        echo
+        RED
+        echo "\"$ACCOUNT_CHOICE\" is not a valid selection."
+        echo
+        echo "Restarting..."
+        sleep 2
+        SINGLE_USER
     else
-        printf "\n\n"
-        UNBLOCK "$USR"
+        # Setting 1st match (-m 1) ensures $ doesn't confuse grep when there's also $$, $$$, $$$$, etc
+        USR="$(grep -m 1 "$ACCOUNT_CHOICE" domainchoices | awk '{print $2}')"
+        rm -rf accountlist accountchoices
+        if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
+            clear
+            HEADER
+            WHITE
+            printf "\"$USR\""
+            RED
+            printf " isn't a valid user on this server, Sparky... run it again...\n"
+            echo
+            SEPARATOR
+            sleep 2
+            SINGLE_USER
+        else
+            clear
+            HEADER
+            GREEN
+            echo "Which operation are we performing?"
+            echo
+            echo " 1) Blocking"
+            echo
+            echo " 2) Unblocking"
+            read CHOICE
+                case $CHOICE in
+                    1) BLOCK;;
+                    2) UNBLOCK;;
+                esac
+        fi
     fi
 fi
 }
@@ -307,6 +309,8 @@ if echo "$answer" | grep -iq "^y" ;then
     if [ -f noidfoundlist ]; then
         rm -rf noidfoundlist
     fi
+    printf "\n\n"
+    exit 0
 else
     echo
     SINGLE_USER
