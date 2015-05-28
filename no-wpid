@@ -136,7 +136,7 @@ BLOCK () {
     WHITE
     cat userlist | uniq
     SEPARATOR
-    if [ ! -f noidfoundlist ]; then
+    if [ -e noidfoundlist ]; then
         echo "No readme.* or license.* files found for account(s):"
         echo
         WHITE
@@ -148,7 +148,7 @@ BLOCK () {
 
 # Unblocks readme.html and license.txt files in WordPress installatins (to allow for upgrading)
 UNBLOCK () {
-    if [ ! -f /home/"$USR"/public_html/readme.html ]; then
+    if [ -f /home/"$USR"/public_html/readme.html ]; then
         clear
         HEADER
         BLUE
@@ -176,7 +176,7 @@ UNBLOCK () {
     WHITE
     cat userlist | uniq
     SEPARATOR
-    if [ -f noidfoundlist ]; then
+    if [ -e noidfoundlist ]; then
         echo "No readme.* or license.* files found for account(s):"
         echo
         WHITE
@@ -196,6 +196,8 @@ echo
 echo " 1) Blocking"
 echo
 echo " 2) Unblocking"
+echo
+echo -n "[enter selection]: "
 read CHOICE
     case $CHOICE in
         1) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
@@ -267,6 +269,8 @@ else
             echo " 1) Blocking"
             echo
             echo " 2) Unblocking"
+            echo
+            echo -n "[enter selection]:"
             read CHOICE
                 case $CHOICE in
                     1) BLOCK;;
