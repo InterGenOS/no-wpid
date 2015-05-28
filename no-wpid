@@ -82,15 +82,16 @@ tput sgr0
 
 # Simple divider
 SEPARATOR () {
-YELLOW
+GREEN
 echo
 echo "----------------------------"
 echo
+WHITE
 }
 
 # Simple divider
 SEPARATOR_WHITE () {
-tput sgr0
+WHITE
 echo "------------------------------------------------------------------"
 }
 
@@ -201,11 +202,80 @@ echo -n "[enter selection]: "
 read CHOICE
     case $CHOICE in
         1) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
-            BLOCK
-           done;;
+            if [ -f /home/"$USR"/public_html/readme.html ]; then
+                clear
+                HEADER
+                BLUE
+                printf "Checking for WordPress Identifiers in account "
+                WHITE
+                printf "\"$USR\"\n"
+                for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do 
+                    chown nobody:nobody "$identifier" && chmod 000 "$identifier" && echo "$USR" >> userlist
+                done
+            else
+                clear
+                HEADER
+                BLUE
+                printf "Checking for WordPress Identifiers in account "
+                WHITE
+                printf "\"$USR\"\n"
+                echo "$USR" >> noidfoundlist
+            fi
+           done
+        clear
+        HEADER
+        BLUE
+        echo "Wordpress Identifiers blocked for account(s):"
+        echo
+        WHITE
+        cat userlist | uniq
+        SEPARATOR
+        if [ -e noidfoundlist ]; then
+            echo "No readme.* or license.* files found for account(s):"
+            echo
+            WHITE
+            cat noidfoundlist | uniq
+        fi
+        printf "\n\n"
+        WHITE;;
         2) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
-            UNBLOCK
-           done;;
+            if [ -f /home/"$USR"/public_html/readme.html ]; then
+                clear
+                HEADER
+                BLUE
+                printf "Checking for WordPress Identifiers in account "
+                WHITE
+                printf "\"$USR\"\n"
+                echo
+                for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
+                    chown "$USR":"$USR" "$identifier" && chmod 644 && "$identifier" && echo "$USR" >> userlist
+                done
+            else
+                clear
+                HEADER
+                BLUE
+                printf "Checking for WordPress Identifiers in account "
+                tput sgr0
+                printf "\"$USR\"\n"
+                echo "$USR" >> noidfoundlist
+            fi
+           done
+        clear
+        HEADER
+        BLUE
+        echo "Wordpress Identifiers unblocked for account(s):"
+        echo
+        WHITE
+        cat userlist | uniq
+        SEPARATOR
+        if [ -e noidfoundlist ]; then
+            echo "No readme.* or license.* files found for account(s):"
+            echo
+            WHITE
+            cat noidfoundlist | uniq
+        fi
+        printf "\n\n"
+        WHITE;;
     esac
 }
 
