@@ -180,7 +180,6 @@ function UNBLOCK {
     printf "\n\n"
     WHITE
     exit 0
-    fi
 }
 
 # Routes for all users
