@@ -245,7 +245,7 @@ else
         SINGLE_USER
     else
         # Setting 1st match (-m 1) ensures $ doesn't confuse grep when there's also $$, $$$, $$$$, etc
-        USR="$(grep -m 1 "$ACCOUNT_CHOICE" domainchoices | awk '{print $2}')"
+        USR="$(grep -m 1 "$ACCOUNT_CHOICE" accountchoices | awk '{print $2}')"
         rm -rf accountlist accountchoices
         if [ "$USR" != "$(grep "$USR" /etc/passwd | cut -d ':' -f 1)" ]; then
             clear
