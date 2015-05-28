@@ -89,7 +89,7 @@ echo
 }
 
 # Simple divider
-function SEPARATOR_WHITE {
+SEPARATOR_WHITE () {
 tput sgr0
 echo "------------------------------------------------------------------"
 }
@@ -108,7 +108,7 @@ printf "\n\n"
 }
 
 # Blocks readme.html and license.txt files in WordPress installations
-function BLOCK {
+BLOCK () {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         clear
         HEADER
@@ -145,7 +145,7 @@ function BLOCK {
 }
 
 # Unblocks readme.html and license.txt files in WordPress installatins (to allow for upgrading)
-function UNBLOCK {
+UNBLOCK () {
     if [ -f /home/"$USR"/public_html/readme.html ]; then
         clear
         HEADER
@@ -183,7 +183,7 @@ function UNBLOCK {
 }
 
 # Routes for all users
-function ALL_USERS {
+ALL_USERS () {
 clear
 HEADER
 GREEN
@@ -212,7 +212,7 @@ fi
 }
 
 # Routes for single users
-function SINGLE_USER {
+SINGLE_USER () {
 clear
 HEADER
 GREEN
