@@ -133,12 +133,17 @@ BLOCK () {
     BLUE
     echo "Wordpress Identifiers blocked for account(s):"
     echo
+    WHITE
     cat userlist | uniq
     SEPARATOR
-    echo "No readme.* or license.* files found for account(s):"
-    echo
-    cat noidfoundlist | uniq 
-    rm -rf userlist noidfoundlist
+    if [ -n $(cat noidfoundlist) ]; then
+        echo "No readme.* or license.* files found for account(s):"
+        echo
+        WHITE
+        cat noidfoundlist | uniq
+        rm -rf noidfoundlist
+    fi
+    rm -rf userlist
     printf "\n\n"
     WHITE
     exit 0
@@ -171,12 +176,17 @@ UNBLOCK () {
     BLUE
     echo "Wordpress Identifiers unblocked for account(s):"
     echo
+    WHITE
     cat userlist | uniq
-    SEPERATOR
-    echo "No readme.* or license.* files found for account(s):"
-    echo
-    cat noidfoundlist | uniq
-    rm -rf userlist noidfoundlist
+    SEPARATOR
+    if [ -n $(cat noidfoundlist) ]; then
+        echo "No readme.* or license.* files found for account(s):"
+        echo
+        WHITE
+        cat noidfoundlist | uniq
+        rm -rf noidfoundlist
+    fi
+    rm -rf userlist
     printf "\n\n"
     WHITE
     exit 0
