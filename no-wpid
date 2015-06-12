@@ -117,7 +117,7 @@ BLOCK () {
         printf "Checking for WordPress Identifiers in account "
         WHITE
         printf "\"$USR\"\n"
-        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do 
+        for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
             chown nobody:nobody "$identifier" && chmod 000 "$identifier" && echo "$USR" >> userlist
         done
     else
@@ -158,7 +158,7 @@ UNBLOCK () {
         printf "\"$USR\"\n"
         echo
         for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
-            chown "$USR":"$USR" "$identifier" && chmod 644 && "$identifier" && echo "$USR" >> userlist
+            chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier" && echo "$USR" >> userlist
         done
     else
         clear
@@ -210,7 +210,7 @@ read CHOICE
                 printf "Checking for WordPress Identifiers in account "
                 WHITE
                 printf "\"$USR\"\n"
-                for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do 
+                for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
                     chown nobody:nobody "$identifier" && chmod 000 "$identifier" && echo "$USR" >> userlist
                 done
             else
