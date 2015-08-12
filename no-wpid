@@ -366,41 +366,63 @@ fi
 ## BEGIN - CORE SCRIPT ##
 ##---------------------##
 #########################
+case $1 in
 
-clear
-HEADER
-GREEN
-echo
-printf "Are we adjusting WordPress Identifiers for the entire server "
-WHITE
-echo -n "[y/n]? "
-old_stty_cfg=$(stty -g)
-stty raw -echo
-answer="$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )"
-stty $old_stty_cfg
-if echo "$answer" | grep -iq "^y" ;then
-    echo
-    ALL_USERS
-    if [ -f userlist ]; then
-        rm -rf userlist
-    fi
-    if [ -f noidfoundlist ]; then
-        rm -rf noidfoundlist
-    fi
-    printf "\n\n"
-    exit 0
-else
-    echo
-    SINGLE_USER
-    if [ -f userlist ]; then
-        rm -rf userlist
-    fi
-    if [ -f noidfoundlist ]; then
-        rm -rf noidfoundlist
-    fi
-fi
-exit 0
+    -u) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
 
+            for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
+
+                chown "$USR":"$USR" "$identifier" && chmod 644 "$identifier" >/dev/null 2>&1
+
+            done
+
+        done
+        ;;
+    -b) for USR in $(grep \: /etc/trueuserdomains | grep -v nobody | awk '{print $2}' | uniq); do
+
+            for identifier in $(find /home/"$USR"/public_html -type f -name "LICENSE.*" -o -name "license.*" -o -name "readme.*" -o -name "README.*"); do
+
+                chown nobody:nobody "$identifier" && chmod 000 "$identifier" >/dev/null 2>&1
+
+            done
+
+        done
+        ;;
+    *) clear
+       HEADER
+       GREEN
+       echo
+       printf "Are we adjusting WordPress Identifiers for the entire server "
+       WHITE
+       echo -n "[y/n]? "
+       old_stty_cfg=$(stty -g)
+       stty raw -echo
+       answer="$( while ! head -c 1 | grep -i '[ny]' ;do true ;done )"
+       stty $old_stty_cfg
+       if echo "$answer" | grep -iq "^y" ;then
+           echo
+           ALL_USERS
+           if [ -f userlist ]; then
+               rm -rf userlist
+           fi
+           if [ -f noidfoundlist ]; then
+               rm -rf noidfoundlist
+           fi
+           printf "\n\n"
+           exit 0
+       else
+           echo
+           SINGLE_USER
+           if [ -f userlist ]; then
+               rm -rf userlist
+           fi
+           if [ -f noidfoundlist ]; then
+               rm -rf noidfoundlist
+           fi
+       fi
+       exit 0
+       ;;
+esac
 #######################
 ##-------------------##
 ## END - CORE SCRIPT ##
